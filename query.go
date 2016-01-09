@@ -4,11 +4,14 @@ import (
 	"fmt"
 )
 
+// Query runs aggregations over a data source.
 type Query struct {
 	Source Iterator
 	Calls  []AggregatorCall
 }
 
+// Execute runs the query and returns the results of the aggregations in a
+// record.
 func (q *Query) Execute() Record {
 	for rec := q.Source.Next(); rec != nil; rec = q.Source.Next() {
 		for _, call := range q.Calls {
@@ -31,8 +34,10 @@ func (q *Query) Execute() Record {
 	return res
 }
 
+// nameGenerator generates unique names from aggregate calls.
 type nameGenerator map[string]bool
 
+// name returns a new unique name.
 func (n nameGenerator) name(call AggregatorCall) string {
 	base := fmt.Sprintf("%s(%s)", call.Aggregator.Name(), call.Key)
 
