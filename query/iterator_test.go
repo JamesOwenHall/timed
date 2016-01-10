@@ -1,4 +1,4 @@
-package timed
+package query
 
 type RecordIterator struct {
 	records []Record

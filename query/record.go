@@ -1,4 +1,4 @@
-package timed
+package query
 
 // ValueType describes the type of a Value.
 type ValueType int

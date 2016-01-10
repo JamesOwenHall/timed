@@ -1,4 +1,4 @@
-package timed
+package query
 
 import (
 	"fmt"

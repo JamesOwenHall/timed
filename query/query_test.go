@@ -1,4 +1,4 @@
-package timed
+package query
 
 import (
 	"reflect"
@@ -6,7 +6,7 @@ import (
 )
 
 func TestQueryExecute(t *testing.T) {
-	query := Query{
+	q := Query{
 		Source: NewRecordIterator([]Record{
 			{"foo": Value{Number, 1}, "bar": Value{Null, nil}},
 			{"foo": Value{Number, 1}, "bar": Value{Null, nil}},
@@ -31,7 +31,7 @@ func TestQueryExecute(t *testing.T) {
 		"count(bar)": Value{Number, 5.0},
 		"dummy":      Value{Number, 0.0},
 	}
-	actual := query.Execute()
+	actual := q.Execute()
 
 	if !reflect.DeepEqual(actual, expected) {
 		t.Errorf("\nExpected: %v\n     Got: %v", expected, actual)
