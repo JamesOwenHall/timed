@@ -25,7 +25,7 @@ func (s *Source) Iterator(start, end time.Time) executor.Iterator {
 
 func (s *Source) makeQuery() string {
 	return fmt.Sprintf(
-		"SELECT * FROM %s WHERE %s >= ? AND %s < ?",
+		"SELECT * FROM %s WHERE %s >= ? AND %s < ? ALLOW FILTERING",
 		s.Name, s.TimeKey, s.TimeKey,
 	)
 }
@@ -37,7 +37,7 @@ type iterator struct {
 func (i *iterator) Next() (executor.Record, error) {
 	m := make(map[string]interface{})
 	if ok := i.iter.MapScan(m); !ok {
-		return nil, nil
+		return nil, i.iter.Close()
 	}
 
 	rec := make(executor.Record)
