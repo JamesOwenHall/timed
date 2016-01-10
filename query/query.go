@@ -12,15 +12,25 @@ type Query struct {
 
 // Execute runs the query and returns the results of the aggregations in a
 // record.
-func (q *Query) Execute() Record {
-	for rec := q.Source.Next(); rec != nil; rec = q.Source.Next() {
+func (q *Query) Execute() (Record, error) {
+	for {
+		rec, err := q.Source.Next()
+		if err != nil {
+			return nil, err
+		}
+		if rec == nil {
+			break
+		}
+
 		for _, call := range q.Calls {
-			val, exists := (*rec)[call.Key]
+			val, exists := rec[call.Key]
 			if !exists {
 				continue
 			}
 
-			call.Aggregator.Next(val)
+			if err := call.Aggregator.Next(val); err != nil {
+				return nil, err
+			}
 		}
 	}
 
@@ -35,7 +45,7 @@ func (q *Query) Execute() Record {
 		}
 	}
 
-	return res
+	return res, nil
 }
 
 // nameGenerator generates unique names from aggregate calls.

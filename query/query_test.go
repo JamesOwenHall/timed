@@ -31,10 +31,13 @@ func TestQueryExecute(t *testing.T) {
 		"count(bar)": Value{Number, 5.0},
 		"dummy":      Value{Number, 0.0},
 	}
-	actual := q.Execute()
+	actual, err := q.Execute()
 
+	if err != nil {
+		t.Fatalf("Unexpected error: %s", err.Error())
+	}
 	if !reflect.DeepEqual(actual, expected) {
-		t.Errorf("\nExpected: %v\n     Got: %v", expected, actual)
+		t.Fatalf("\nExpected: %v\n     Got: %v", expected, actual)
 	}
 }
 
@@ -52,7 +55,7 @@ func TestNameGenerator(t *testing.T) {
 	for _, exp := range expected {
 		actual := ng.name(call)
 		if actual != exp {
-			t.Errorf("\nExpected: %s\n     Got: %s", exp, actual)
+			t.Fatalf("\nExpected: %s\n     Got: %s", exp, actual)
 		}
 	}
 }
