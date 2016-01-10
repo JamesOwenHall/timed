@@ -20,16 +20,16 @@ func TestQueryExecute(t *testing.T) {
 			{"foo": Value{Number, 1}},
 		}),
 		Calls: []AggregatorCall{
-			{"foo", new(CountAggregator)},
-			{"bar", new(CountAggregator)},
-			{"baz", new(CountAggregator)},
+			{Key: "foo", Aggregator: new(CountAggregator)},
+			{Key: "bar", Aggregator: new(CountAggregator)},
+			{Key: "baz", Aggregator: new(CountAggregator), Alias: "dummy"},
 		},
 	}
 
 	expected := Record{
 		"count(foo)": Value{Number, 10.0},
 		"count(bar)": Value{Number, 5.0},
-		"count(baz)": Value{Number, 0.0},
+		"dummy":      Value{Number, 0.0},
 	}
 	actual := query.Execute()
 
@@ -39,7 +39,7 @@ func TestQueryExecute(t *testing.T) {
 }
 
 func TestNameGenerator(t *testing.T) {
-	call := AggregatorCall{"foo", new(CountAggregator)}
+	call := AggregatorCall{Key: "foo", Aggregator: new(CountAggregator)}
 	ng := make(nameGenerator)
 
 	expected := []string{

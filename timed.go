@@ -20,4 +20,5 @@ type Aggregator interface {
 type AggregatorCall struct {
 	Key        string
 	Aggregator Aggregator
+	Alias      string
 }

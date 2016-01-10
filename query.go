@@ -27,8 +27,12 @@ func (q *Query) Execute() Record {
 	res := make(Record)
 	ng := make(nameGenerator)
 	for _, call := range q.Calls {
-		name := ng.name(call)
-		res[name] = call.Aggregator.Final()
+		if call.Alias != "" {
+			res[call.Alias] = call.Aggregator.Final()
+		} else {
+			name := ng.name(call)
+			res[name] = call.Aggregator.Final()
+		}
 	}
 
 	return res
