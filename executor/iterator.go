@@ -1,4 +1,4 @@
-package query
+package executor
 
 // Iterator represents any data source that can be iterated over.  Next returns
 // nil once the end of the data has been reached.

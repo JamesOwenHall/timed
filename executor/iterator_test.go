@@ -1,4 +1,8 @@
-package query
+package executor
+
+import (
+	"fmt"
+)
 
 type RecordIterator struct {
 	records []Record
@@ -36,5 +40,24 @@ func (c *CountAggregator) Final() Value {
 	return Value{
 		Type: Number,
 		Data: float64(c.count),
+	}
+}
+
+var ErrErrorAggregator = fmt.Errorf("error from ErrorAggregator")
+
+type ErrorAggregator struct{}
+
+func (e *ErrorAggregator) Name() string {
+	return "error"
+}
+
+func (e *ErrorAggregator) Next(v Value) error {
+	return ErrErrorAggregator
+}
+
+func (e *ErrorAggregator) Final() Value {
+	return Value{
+		Type: Null,
+		Data: nil,
 	}
 }

@@ -1,20 +1,20 @@
-package query
+package executor
 
 import (
 	"fmt"
 )
 
-// Query runs aggregations over a data source.
-type Query struct {
+// Executor runs aggregations over a data source.
+type Executor struct {
 	Source Iterator
 	Calls  []AggregatorCall
 }
 
 // Execute runs the query and returns the results of the aggregations in a
 // record.
-func (q *Query) Execute() (Record, error) {
+func (e *Executor) Execute() (Record, error) {
 	for {
-		rec, err := q.Source.Next()
+		rec, err := e.Source.Next()
 		if err != nil {
 			return nil, err
 		}
@@ -22,7 +22,7 @@ func (q *Query) Execute() (Record, error) {
 			break
 		}
 
-		for _, call := range q.Calls {
+		for _, call := range e.Calls {
 			val, exists := rec[call.Key]
 			if !exists {
 				continue
@@ -36,7 +36,7 @@ func (q *Query) Execute() (Record, error) {
 
 	res := make(Record)
 	ng := make(nameGenerator)
-	for _, call := range q.Calls {
+	for _, call := range e.Calls {
 		if call.Alias != "" {
 			res[call.Alias] = call.Aggregator.Final()
 		} else {

@@ -1,12 +1,12 @@
-package query
+package executor
 
 import (
 	"reflect"
 	"testing"
 )
 
-func TestQueryExecute(t *testing.T) {
-	q := Query{
+func TestExecutorExecute(t *testing.T) {
+	q := Executor{
 		Source: NewRecordIterator([]Record{
 			{"foo": Value{Number, 1}, "bar": Value{Null, nil}},
 			{"foo": Value{Number, 1}, "bar": Value{Null, nil}},
@@ -38,6 +38,23 @@ func TestQueryExecute(t *testing.T) {
 	}
 	if !reflect.DeepEqual(actual, expected) {
 		t.Fatalf("\nExpected: %v\n     Got: %v", expected, actual)
+	}
+}
+
+func TestExecutorExecuteError(t *testing.T) {
+	q := Executor{
+		Source: NewRecordIterator([]Record{
+			{"foo": Value{Number, 1}},
+		}),
+		Calls: []AggregatorCall{
+			{Key: "foo", Aggregator: new(CountAggregator)},
+			{Key: "foo", Aggregator: new(ErrorAggregator)},
+		},
+	}
+
+	_, err := q.Execute()
+	if err != ErrErrorAggregator {
+		t.Fatalf("\nExpected: %s\n     Got: %v", ErrErrorAggregator, err)
 	}
 }
 
