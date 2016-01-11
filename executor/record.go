@@ -13,6 +13,25 @@ const (
 	String
 )
 
+func (v ValueType) String() string {
+	switch v {
+	case Int64:
+		return "int64"
+	case Int:
+		return "int"
+	case Float64:
+		return "float64"
+	case Float32:
+		return "float32"
+	case Boolean:
+		return "bool"
+	case String:
+		return "string"
+	default:
+		return "unknown"
+	}
+}
+
 // Value is arbitrary data with type information.
 type Value struct {
 	Type ValueType
