@@ -4,9 +4,12 @@ package executor
 type ValueType int
 
 const (
-	Null ValueType = iota
+	Unknown ValueType = iota
+	Int64
+	Int
+	Float64
+	Float32
 	Boolean
-	Number
 	String
 )
 

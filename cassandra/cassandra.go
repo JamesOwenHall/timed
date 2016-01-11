@@ -43,6 +43,26 @@ func (i *iterator) Next() (executor.Record, error) {
 	rec := make(executor.Record)
 	for k, v := range m {
 		switch v := v.(type) {
+		case int64:
+			rec[k] = executor.Value{
+				Type: executor.Int64,
+				Data: v,
+			}
+		case int:
+			rec[k] = executor.Value{
+				Type: executor.Int,
+				Data: v,
+			}
+		case float64:
+			rec[k] = executor.Value{
+				Type: executor.Float64,
+				Data: v,
+			}
+		case float32:
+			rec[k] = executor.Value{
+				Type: executor.Float32,
+				Data: v,
+			}
 		case string:
 			rec[k] = executor.Value{
 				Type: executor.String,
@@ -55,7 +75,7 @@ func (i *iterator) Next() (executor.Record, error) {
 			}
 		default:
 			rec[k] = executor.Value{
-				Type: executor.Null,
+				Type: executor.Unknown,
 				Data: nil,
 			}
 		}
