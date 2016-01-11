@@ -73,6 +73,11 @@ func (i *iterator) Next() (executor.Record, error) {
 				Type: executor.Boolean,
 				Data: v,
 			}
+		case time.Time:
+			rec[k] = executor.Value{
+				Type: executor.Time,
+				Data: v,
+			}
 		default:
 			rec[k] = executor.Value{
 				Type: executor.Unknown,

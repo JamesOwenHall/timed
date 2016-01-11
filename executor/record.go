@@ -11,6 +11,7 @@ const (
 	Float32
 	Boolean
 	String
+	Time
 )
 
 func (v ValueType) String() string {
@@ -27,6 +28,8 @@ func (v ValueType) String() string {
 		return "bool"
 	case String:
 		return "string"
+	case Time:
+		return "time"
 	default:
 		return "unknown"
 	}
