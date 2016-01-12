@@ -8,16 +8,16 @@ import (
 func TestExecutorExecute(t *testing.T) {
 	q := Executor{
 		Source: NewRecordIterator([]Record{
-			{"foo": Value{Number, 1}, "bar": Value{Null, nil}},
-			{"foo": Value{Number, 1}, "bar": Value{Null, nil}},
-			{"foo": Value{Number, 1}, "bar": Value{Null, nil}},
-			{"foo": Value{Number, 1}, "bar": Value{Null, nil}},
-			{"foo": Value{Number, 1}, "bar": Value{Null, nil}},
-			{"foo": Value{Number, 1}},
-			{"foo": Value{Number, 1}},
-			{"foo": Value{Number, 1}},
-			{"foo": Value{Number, 1}},
-			{"foo": Value{Number, 1}},
+			{"foo": Value{Int, 1}, "bar": Value{Unknown, nil}},
+			{"foo": Value{Int, 1}, "bar": Value{Unknown, nil}},
+			{"foo": Value{Int, 1}, "bar": Value{Unknown, nil}},
+			{"foo": Value{Int, 1}, "bar": Value{Unknown, nil}},
+			{"foo": Value{Int, 1}, "bar": Value{Unknown, nil}},
+			{"foo": Value{Int, 1}},
+			{"foo": Value{Int, 1}},
+			{"foo": Value{Int, 1}},
+			{"foo": Value{Int, 1}},
+			{"foo": Value{Int, 1}},
 		}),
 		Calls: []AggregatorCall{
 			{Key: "foo", Aggregator: new(CountAggregator)},
@@ -27,9 +27,9 @@ func TestExecutorExecute(t *testing.T) {
 	}
 
 	expected := Record{
-		"count(foo)": Value{Number, 10.0},
-		"count(bar)": Value{Number, 5.0},
-		"dummy":      Value{Number, 0.0},
+		"count(foo)": Value{Int, 10},
+		"count(bar)": Value{Int, 5},
+		"dummy":      Value{Int, 0},
 	}
 	actual, err := q.Execute()
 
@@ -44,7 +44,7 @@ func TestExecutorExecute(t *testing.T) {
 func TestExecutorExecuteError(t *testing.T) {
 	q := Executor{
 		Source: NewRecordIterator([]Record{
-			{"foo": Value{Number, 1}},
+			{"foo": Value{Int, 1}},
 		}),
 		Calls: []AggregatorCall{
 			{Key: "foo", Aggregator: new(CountAggregator)},

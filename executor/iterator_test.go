@@ -38,8 +38,8 @@ func (c *CountAggregator) Next(v Value) error {
 
 func (c *CountAggregator) Final() Value {
 	return Value{
-		Type: Number,
-		Data: float64(c.count),
+		Type: Int,
+		Data: c.count,
 	}
 }
 
@@ -57,7 +57,7 @@ func (e *ErrorAggregator) Next(v Value) error {
 
 func (e *ErrorAggregator) Final() Value {
 	return Value{
-		Type: Null,
+		Type: Unknown,
 		Data: nil,
 	}
 }

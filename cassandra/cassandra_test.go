@@ -1,15 +1,92 @@
 package cassandra
 
 import (
+	"os"
+	"reflect"
 	"testing"
+	"time"
+
+	"github.com/JamesOwenHall/timed/executor"
+
+	"github.com/gocql/gocql"
 )
+
+var session *gocql.Session
+
+func init() {
+	if cass := os.Getenv("TEST_CASSANDRA"); cass != "" {
+		cluster := gocql.NewCluster(cass)
+		cluster.Keyspace = "timed"
+
+		var err error
+		session, err = cluster.CreateSession()
+		if err != nil {
+			panic(err)
+		}
+	}
+}
+
+func TestIterator(t *testing.T) {
+	if session == nil {
+		t.Skip("Cassandra is not initialized.")
+	}
+
+	source := Source{
+		Session:     session,
+		Consistency: gocql.One,
+		Name:        "data",
+		TimeKey:     "period",
+	}
+	iter := source.Iterator(
+		time.Date(2015, 1, 2, 0, 0, 0, 0, time.UTC),
+		time.Date(2015, 1, 5, 0, 0, 0, 0, time.UTC),
+	)
+
+	expected := []executor.Record{
+		{
+			"partition": executor.Value{executor.Int, 1},
+			"period":    executor.Value{executor.Time, time.Date(2015, 1, 2, 0, 0, 0, 0, time.UTC)},
+			"shop_id":   executor.Value{executor.Int64, int64(100)},
+			"sample":    executor.Value{executor.String, "hola"},
+		},
+		{
+			"partition": executor.Value{executor.Int, 1},
+			"period":    executor.Value{executor.Time, time.Date(2015, 1, 3, 0, 0, 0, 0, time.UTC)},
+			"shop_id":   executor.Value{executor.Int64, int64(100)},
+			"sample":    executor.Value{executor.String, "hola"},
+		},
+		{
+			"partition": executor.Value{executor.Int, 1},
+			"period":    executor.Value{executor.Time, time.Date(2015, 1, 4, 0, 0, 0, 0, time.UTC)},
+			"shop_id":   executor.Value{executor.Int64, int64(100)},
+			"sample":    executor.Value{executor.String, "hola"},
+		},
+	}
+
+	actual := []executor.Record{}
+	for {
+		rec, err := iter.Next()
+		if err != nil {
+			t.Fatalf("Error: %s", err.Error())
+		}
+		if rec == nil {
+			break
+		}
+
+		actual = append(actual, rec)
+	}
+
+	if !reflect.DeepEqual(actual, expected) {
+		t.Fatalf("\nExpected: %v\n     Got: %v", expected, actual)
+	}
+}
 
 func TestSourceMakeQuery(t *testing.T) {
 	source := Source{
 		Name:    "foo",
 		TimeKey: "tk",
 	}
-	expected := "SELECT * FROM foo WHERE tk >= ? AND tk < ?"
+	expected := "SELECT * FROM foo WHERE tk >= ? AND tk < ? ALLOW FILTERING"
 	actual := source.makeQuery()
 
 	if actual != expected {
