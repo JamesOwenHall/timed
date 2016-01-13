@@ -27,11 +27,25 @@ func init() {
 	}
 }
 
+func defaultContext() *Context {
+	return &Context{
+		Sources: []cassandra.Source{
+			cassandra.Source{
+				Session:     session,
+				Consistency: gocql.One,
+				Name:        "data",
+				TimeKey:     "period",
+			},
+		},
+	}
+}
+
 func TestExecuteQuery(t *testing.T) {
 	if session == nil {
 		t.Skip("Cassandra is not initialized.")
 	}
 
+	context := defaultContext()
 	q := &Query{
 		Source: "data",
 		Start:  time.Date(2015, 1, 1, 0, 0, 0, 0, time.UTC),
@@ -48,17 +62,6 @@ func TestExecuteQuery(t *testing.T) {
 		},
 	}
 
-	context := Context{
-		Sources: []cassandra.Source{
-			cassandra.Source{
-				Session:     session,
-				Consistency: gocql.One,
-				Name:        "data",
-				TimeKey:     "period",
-			},
-		},
-	}
-
 	expected := executor.Record{
 		"count(shop_id)":    executor.Value{executor.Int64, int64(4)},
 		"count(fake_field)": executor.Value{executor.Int64, int64(0)},
@@ -70,5 +73,54 @@ func TestExecuteQuery(t *testing.T) {
 	}
 	if !reflect.DeepEqual(actual, expected) {
 		t.Fatalf("\nExpected: %v\n     Got: %v", expected, actual)
+	}
+}
+
+func TestUnknownSource(t *testing.T) {
+	context := defaultContext()
+	q := &Query{
+		Source: "FAKE_SOURCE",
+	}
+
+	_, err := context.ExecuteQuery(q)
+	qerr := err.(*ErrInvalidQuery)
+	if qerr.Component != "source" {
+		t.Fatalf("Unexpected error: %s", err.Error())
+	}
+}
+
+func TestInvalidRange(t *testing.T) {
+	context := defaultContext()
+	q := &Query{
+		Source: "data",
+		Start:  time.Date(2015, 1, 1, 0, 0, 0, 0, time.UTC),
+		End:    time.Date(2015, 1, 1, 0, 0, 0, 0, time.UTC),
+	}
+
+	_, err := context.ExecuteQuery(q)
+	qerr := err.(*ErrInvalidQuery)
+	if qerr.Component != "end" {
+		t.Fatalf("Unexpected error: %s", err.Error())
+	}
+}
+
+func TestUnknownFunction(t *testing.T) {
+	context := defaultContext()
+	q := &Query{
+		Source: "data",
+		Start:  time.Date(2015, 1, 1, 0, 0, 0, 0, time.UTC),
+		End:    time.Date(2015, 1, 2, 0, 0, 0, 0, time.UTC),
+		Calls: []FunctionCall{
+			FunctionCall{
+				Function: "FAKE",
+				Argument: "period",
+			},
+		},
+	}
+
+	_, err := context.ExecuteQuery(q)
+	qerr := err.(*ErrInvalidQuery)
+	if qerr.Component != "compute" {
+		t.Fatalf("Unexpected error: %s", err.Error())
 	}
 }
