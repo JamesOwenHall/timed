@@ -13,23 +13,21 @@ func TestExecutorExecute(t *testing.T) {
 			{"foo": Value{Int, 1}, "bar": Value{Unknown, nil}},
 			{"foo": Value{Int, 1}, "bar": Value{Unknown, nil}},
 			{"foo": Value{Int, 1}, "bar": Value{Unknown, nil}},
-			{"foo": Value{Int, 1}},
-			{"foo": Value{Int, 1}},
-			{"foo": Value{Int, 1}},
-			{"foo": Value{Int, 1}},
-			{"foo": Value{Int, 1}},
+			{"foo": Value{Int, 1}, "bar": Value{Unknown, nil}},
+			{"foo": Value{Int, 1}, "bar": Value{Unknown, nil}},
+			{"foo": Value{Int, 1}, "bar": Value{Unknown, nil}},
+			{"foo": Value{Int, 1}, "bar": Value{Unknown, nil}},
+			{"foo": Value{Int, 1}, "bar": Value{Unknown, nil}},
 		}),
 		Calls: []AggregatorCall{
 			{Key: "foo", Aggregator: new(CountAggregator)},
 			{Key: "bar", Aggregator: new(CountAggregator)},
-			{Key: "baz", Aggregator: new(CountAggregator), Alias: "dummy"},
 		},
 	}
 
 	expected := Record{
 		"count_foo": Value{Int, 10},
-		"count_bar": Value{Int, 5},
-		"dummy":     Value{Int, 0},
+		"count_bar": Value{Int, 10},
 	}
 	actual, err := q.Execute()
 
@@ -41,7 +39,26 @@ func TestExecutorExecute(t *testing.T) {
 	}
 }
 
-func TestExecutorExecuteError(t *testing.T) {
+func TestUnknownField(t *testing.T) {
+	q := Executor{
+		Source: NewRecordIterator([]Record{
+			{"foo": Value{Int, 1}},
+			{"foo": Value{Int, 2}},
+			{"foo": Value{Int, 3}},
+		}),
+		Calls: []AggregatorCall{
+			{Key: "fake_field", Aggregator: new(CountAggregator)},
+		},
+	}
+
+	_, err := q.Execute()
+	eerr := err.(*ErrExecution)
+	if eerr.Component != "fake_field" {
+		t.Fatalf("Unexpected error: %s", eerr.Error())
+	}
+}
+
+func TestExecutorAggregatorError(t *testing.T) {
 	q := Executor{
 		Source: NewRecordIterator([]Record{
 			{"foo": Value{Int, 1}},

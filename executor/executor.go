@@ -25,7 +25,10 @@ func (e *Executor) Execute() (Record, error) {
 		for _, call := range e.Calls {
 			val, exists := rec[call.Key]
 			if !exists {
-				continue
+				return nil, &ErrExecution{
+					Message:   "unknown field",
+					Component: call.Key,
+				}
 			}
 
 			if err := call.Aggregator.Next(val); err != nil {
@@ -67,4 +70,13 @@ func (n nameGenerator) name(call AggregatorCall) string {
 			return name
 		}
 	}
+}
+
+type ErrExecution struct {
+	Message   string
+	Component string
+}
+
+func (e *ErrExecution) Error() string {
+	return fmt.Sprintf("execution error => %s (%s)", e.Message, e.Component)
 }
