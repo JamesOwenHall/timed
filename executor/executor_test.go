@@ -27,9 +27,9 @@ func TestExecutorExecute(t *testing.T) {
 	}
 
 	expected := Record{
-		"count(foo)": Value{Int, 10},
-		"count(bar)": Value{Int, 5},
-		"dummy":      Value{Int, 0},
+		"count_foo": Value{Int, 10},
+		"count_bar": Value{Int, 5},
+		"dummy":     Value{Int, 0},
 	}
 	actual, err := q.Execute()
 
@@ -63,10 +63,10 @@ func TestNameGenerator(t *testing.T) {
 	ng := make(nameGenerator)
 
 	expected := []string{
-		"count(foo)",
-		"count(foo) - 2",
-		"count(foo) - 3",
-		"count(foo) - 4",
+		"count_foo",
+		"count_foo_2",
+		"count_foo_3",
+		"count_foo_4",
 	}
 
 	for _, exp := range expected {

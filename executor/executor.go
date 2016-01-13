@@ -53,7 +53,7 @@ type nameGenerator map[string]bool
 
 // name returns a new unique name.
 func (n nameGenerator) name(call AggregatorCall) string {
-	base := fmt.Sprintf("%s(%s)", call.Aggregator.Name(), call.Key)
+	base := fmt.Sprintf("%s_%s", call.Aggregator.Name(), call.Key)
 
 	if !n[base] {
 		n[base] = true
@@ -61,7 +61,7 @@ func (n nameGenerator) name(call AggregatorCall) string {
 	}
 
 	for i := 2; ; i++ {
-		name := fmt.Sprintf("%s - %d", base, i)
+		name := fmt.Sprintf("%s_%d", base, i)
 		if !n[name] {
 			n[name] = true
 			return name
