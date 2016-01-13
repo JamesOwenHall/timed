@@ -79,7 +79,7 @@ type ErrInvalidQuery struct {
 
 func (e *ErrInvalidQuery) Error() string {
 	return fmt.Sprintf(
-		"invalid query => %s component: %s, value: %s",
+		"invalid query => %s (component: %s, value: %s)",
 		e.Message, e.Component, e.Value,
 	)
 }
