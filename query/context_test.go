@@ -55,16 +55,11 @@ func TestExecuteQuery(t *testing.T) {
 				Function: "count",
 				Argument: "shop_id",
 			},
-			FunctionCall{
-				Function: "count",
-				Argument: "fake_field",
-			},
 		},
 	}
 
 	expected := executor.Record{
-		"count_shop_id":    executor.Value{executor.Int64, int64(4)},
-		"count_fake_field": executor.Value{executor.Int64, int64(0)},
+		"count_shop_id": executor.Value{executor.Int64, int64(4)},
 	}
 
 	actual, err := context.ExecuteQuery(q)
