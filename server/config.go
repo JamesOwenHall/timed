@@ -12,6 +12,7 @@ type Config struct {
 	}
 	Sources []struct {
 		Name        string
+		Timekey     string
 		Consistency string
 	}
 }

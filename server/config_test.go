@@ -15,8 +15,10 @@ cassandra:
     - "5.6.7.8:5678"
 sources:
   - name: table1
+    timekey: field1
     consistency: one
   - name: table2
+    timekey: field_foo
 `)
 
 	expected := &Config{
@@ -30,10 +32,11 @@ sources:
 		},
 		Sources: []struct {
 			Name        string
+			Timekey     string
 			Consistency string
 		}{
-			{Name: "table1", Consistency: "one"},
-			{Name: "table2", Consistency: ""},
+			{Name: "table1", Timekey: "field1", Consistency: "one"},
+			{Name: "table2", Timekey: "field_foo", Consistency: ""},
 		},
 	}
 
