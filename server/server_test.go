@@ -4,6 +4,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/gocql/gocql"
 )
 
@@ -33,7 +34,7 @@ sources:
 		t.Fatalf("Error: %s", err.Error())
 	}
 
-	server, err := NewServer(config)
+	server, err := NewServer(logrus.StandardLogger(), config)
 	if err != nil {
 		t.Fatalf("Error: %s", err.Error())
 	}
@@ -41,16 +42,16 @@ sources:
 	if server.server.Addr != ":1234" {
 		t.Errorf("listen: %s", server.server.Addr)
 	}
-	if len(server.sources) != 1 {
-		t.Fatalf("sources: %s", server.sources)
+	if len(server.context.Sources) != 1 {
+		t.Fatalf("sources: %s", server.context.Sources)
 	}
-	if server.sources[0].Name != "table1" {
-		t.Errorf("source name: %s", server.sources[0].Name)
+	if server.context.Sources[0].Name != "table1" {
+		t.Errorf("source name: %s", server.context.Sources[0].Name)
 	}
-	if server.sources[0].TimeKey != "time" {
-		t.Errorf("source timekey: %s", server.sources[0].TimeKey)
+	if server.context.Sources[0].TimeKey != "time" {
+		t.Errorf("source timekey: %s", server.context.Sources[0].TimeKey)
 	}
-	if server.sources[0].Consistency != gocql.One {
-		t.Errorf("source consistency: %s", server.sources[0].Consistency)
+	if server.context.Sources[0].Consistency != gocql.One {
+		t.Errorf("source consistency: %s", server.context.Sources[0].Consistency)
 	}
 }

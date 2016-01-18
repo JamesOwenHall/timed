@@ -1,0 +1,9 @@
+listen: ":8565"
+cassandra:
+  keyspace: timed
+  addresses:
+    - "192.168.99.100:9042"
+sources:
+  - name: data
+    timekey: period
+    consistency: one

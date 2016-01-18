@@ -1,21 +1,25 @@
 package server
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 
 	"github.com/JamesOwenHall/timed/cassandra"
+	"github.com/JamesOwenHall/timed/query"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/gocql/gocql"
 )
 
 type Server struct {
-	sources []cassandra.Source
+	context query.Context
 	server  *http.Server
 	mux     *http.ServeMux
+	log     *logrus.Logger
 }
 
-func NewServer(config *Config) (*Server, error) {
+func NewServer(log *logrus.Logger, config *Config) (*Server, error) {
 	cluster := gocql.NewCluster(config.Cassandra.Addresses...)
 	cluster.Keyspace = config.Cassandra.Keyspace
 
@@ -39,18 +43,66 @@ func NewServer(config *Config) (*Server, error) {
 		})
 	}
 
-	mux := http.NewServeMux()
-	return &Server{
-		sources: sources,
+	server := &Server{
+		context: query.Context{Sources: sources},
 		server: &http.Server{
-			Addr:    config.Listen,
-			Handler: mux,
+			Addr: config.Listen,
 		},
-	}, nil
+		log: log,
+	}
+	server.server.Handler = server
+
+	return server, nil
 }
 
 func (s *Server) ListenAndServe() error {
+	s.log.WithField("address", s.server.Addr).Info("server listening")
 	return s.server.ListenAndServe()
+}
+
+func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	req := s.NewRequest(w, r)
+
+	switch path := r.URL.Path; path {
+	case "/query":
+		s.Query(req)
+	default:
+		req.NotFound("unknown endpoint " + path)
+	}
+
+	if req.err != "" {
+		req.log.Error(req.err)
+	} else {
+		req.log.Info("success")
+	}
+}
+
+func (s *Server) Query(req *Request) {
+	queryFormValue := req.r.FormValue("query")
+
+	if queryFormValue == "" {
+		req.BadRequest(`missing required "query" field`)
+		return
+	}
+
+	var q query.Query
+	if err := json.Unmarshal([]byte(queryFormValue), &q); err != nil {
+		req.BadRequest(err.Error())
+		return
+	}
+
+	result, err := s.context.ExecuteQuery(&q)
+	if err != nil {
+		req.InternalServerError(err.Error())
+		return
+	}
+
+	response, err := json.Marshal(result)
+	if err != nil {
+		req.InternalServerError(err.Error())
+	}
+
+	req.w.Write(response)
 }
 
 func parseConsistency(s string) (c gocql.Consistency, err error) {
