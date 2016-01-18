@@ -35,10 +35,14 @@ func (v ValueType) String() string {
 	}
 }
 
+func (v ValueType) MarshalJSON() ([]byte, error) {
+	return []byte(`"` + v.String() + `"`), nil
+}
+
 // Value is arbitrary data with type information.
 type Value struct {
-	Type ValueType
-	Data interface{}
+	Type ValueType   `json:"type"`
+	Data interface{} `json:"data"`
 }
 
 // Record is a map from string keys to Values.
