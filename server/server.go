@@ -63,10 +63,9 @@ func (s *Server) ListenAndServe() error {
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	req := s.NewRequest(w, r)
 
-	switch path := r.URL.Path; path {
-	case "/query":
+	if path := r.URL.Path; path == "/query" {
 		s.Query(req)
-	default:
+	} else {
 		req.NotFound("unknown endpoint " + path)
 	}
 
@@ -78,8 +77,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) Query(req *Request) {
-	queryFormValue := req.r.FormValue("query")
+	if req.r.Method != "POST" {
+		req.BadRequest("invalid HTTP method, use POST")
+		return
+	}
 
+	queryFormValue := req.r.PostFormValue("query")
 	if queryFormValue == "" {
 		req.BadRequest(`missing required "query" field`)
 		return
