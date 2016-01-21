@@ -2,6 +2,9 @@ export TEST_CASSANDRA=192.168.99.100
 
 all: bin/timed-server
 
+clean:
+	rm -rf bin
+
 test:
 	go test -v ./...
 
@@ -14,4 +17,4 @@ bin/timed-server: bin cmd/timed-server/*.go cassandra/*.go executor/*.go query/*
 fmt:
 	go fmt ./...
 
-.PHONY: fmt test
+.PHONY: clean test fmt
