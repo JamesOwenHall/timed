@@ -15,7 +15,6 @@ import (
 type Server struct {
 	context query.Context
 	server  *http.Server
-	mux     *http.ServeMux
 	log     *logrus.Logger
 }
 
