@@ -17,4 +17,7 @@ bin/timed-server: bin cmd/timed-server/*.go cassandra/*.go executor/*.go query/*
 fmt:
 	go fmt ./...
 
-.PHONY: clean test fmt
+run:
+	go run cmd/timed-server/main.go -c timed_default.yml
+
+.PHONY: clean test fmt run

@@ -1,7 +1,6 @@
 package server
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -44,10 +43,8 @@ func NewServer(log *logrus.Logger, config *Config) (*Server, error) {
 
 	server := &Server{
 		context: query.Context{Sources: sources},
-		server: &http.Server{
-			Addr: config.Listen,
-		},
-		log: log,
+		server:  &http.Server{Addr: config.Listen},
+		log:     log,
 	}
 	server.server.Handler = server
 
@@ -62,9 +59,10 @@ func (s *Server) ListenAndServe() error {
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	req := s.NewRequest(w, r)
 
-	if path := r.URL.Path; path == "/query" {
-		s.Query(req)
-	} else {
+	switch path := r.URL.Path; path {
+	case "/query":
+		s.HandleQuery(req)
+	default:
 		req.NotFound("unknown endpoint " + path)
 	}
 
@@ -73,38 +71,6 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	} else {
 		req.log.Info("success")
 	}
-}
-
-func (s *Server) Query(req *Request) {
-	if req.r.Method != "POST" {
-		req.BadRequest("invalid HTTP method, use POST")
-		return
-	}
-
-	queryFormValue := req.r.PostFormValue("query")
-	if queryFormValue == "" {
-		req.BadRequest(`missing required "query" field`)
-		return
-	}
-
-	var q query.Query
-	if err := json.Unmarshal([]byte(queryFormValue), &q); err != nil {
-		req.BadRequest(err.Error())
-		return
-	}
-
-	result, err := s.context.ExecuteQuery(&q)
-	if err != nil {
-		req.InternalServerError(err.Error())
-		return
-	}
-
-	response, err := json.Marshal(result)
-	if err != nil {
-		req.InternalServerError(err.Error())
-	}
-
-	req.w.Write(response)
 }
 
 func parseConsistency(s string) (c gocql.Consistency, err error) {
