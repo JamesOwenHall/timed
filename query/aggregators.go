@@ -13,6 +13,8 @@ func NewAggregator(name string) executor.Aggregator {
 		return new(CountAggregator)
 	case "sum":
 		return new(SumAggregator)
+	case "avg":
+		return new(AvgAggregator)
 	default:
 		return nil
 	}
@@ -71,6 +73,56 @@ func (s *SumAggregator) Final() executor.Value {
 	}
 
 	return executor.Value{Type: executor.Float64, Data: s.floatSum}
+}
+
+type AvgAggregator struct {
+	intSum   int64
+	floatSum float64
+	count    int64
+}
+
+func (a *AvgAggregator) Name() string {
+	return "avg"
+}
+
+func (a *AvgAggregator) Next(v executor.Value) error {
+	a.count++
+
+	switch v.Type {
+	case executor.Int64:
+		a.intSum += v.Data.(int64)
+	case executor.Int:
+		a.intSum += int64(v.Data.(int))
+	case executor.Float64:
+		a.floatSum += v.Data.(float64)
+	case executor.Float32:
+		a.floatSum += float64(v.Data.(float32))
+	default:
+		return &ErrInvalidArg{Type: v.Type, Function: "avg"}
+	}
+
+	return nil
+}
+
+func (a *AvgAggregator) Final() executor.Value {
+	if a.intSum != 0 {
+		return executor.Value{
+			Type: executor.Float64,
+			Data: float64(a.intSum) / float64(a.count),
+		}
+	}
+
+	if a.floatSum == 0.0 {
+		return executor.Value{
+			Type: executor.Float64,
+			Data: 0.0,
+		}
+	}
+
+	return executor.Value{
+		Type: executor.Float64,
+		Data: a.floatSum / float64(a.count),
+	}
 }
 
 type ErrInvalidArg struct {
