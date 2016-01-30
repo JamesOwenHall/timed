@@ -7,24 +7,24 @@ import (
 )
 
 func (s *Server) HandleQuery(req *Request) {
-	if req.r.Method != "POST" {
-		req.BadRequest("invalid HTTP method, use POST")
+	if req.r.Method != "GET" {
+		req.BadRequest("invalid HTTP method, use GET")
 		return
 	}
 
-	queryFormValue := req.r.PostFormValue("query")
+	queryFormValue := req.r.FormValue("query")
 	if queryFormValue == "" {
 		req.BadRequest(`missing required "query" field`)
 		return
 	}
 
-	var q query.Query
-	if err := json.Unmarshal([]byte(queryFormValue), &q); err != nil {
+	q, err := query.Parse(queryFormValue)
+	if err != nil {
 		req.BadRequest(err.Error())
 		return
 	}
 
-	result, err := s.context.ExecuteQuery(&q)
+	result, err := s.context.ExecuteQuery(q)
 	if err != nil {
 		req.InternalServerError(err.Error())
 		return
