@@ -48,8 +48,8 @@ func TestExecuteQuery(t *testing.T) {
 	context := defaultContext()
 	q := &Query{
 		Source: "data",
-		Start:  time.Date(2015, 1, 1, 0, 0, 0, 0, time.UTC),
-		End:    time.Date(2015, 1, 5, 0, 0, 0, 0, time.UTC),
+		Since:  time.Date(2015, 1, 1, 0, 0, 0, 0, time.UTC),
+		Until:  time.Date(2015, 1, 5, 0, 0, 0, 0, time.UTC),
 		Calls: []FunctionCall{
 			FunctionCall{
 				Function: "count",
@@ -88,8 +88,8 @@ func TestInvalidRange(t *testing.T) {
 	context := defaultContext()
 	q := &Query{
 		Source: "data",
-		Start:  time.Date(2015, 1, 1, 0, 0, 0, 0, time.UTC),
-		End:    time.Date(2015, 1, 1, 0, 0, 0, 0, time.UTC),
+		Since:  time.Date(2015, 1, 1, 0, 0, 0, 0, time.UTC),
+		Until:  time.Date(2015, 1, 1, 0, 0, 0, 0, time.UTC),
 	}
 
 	_, err := context.ExecuteQuery(q)
@@ -103,8 +103,8 @@ func TestUnknownFunction(t *testing.T) {
 	context := defaultContext()
 	q := &Query{
 		Source: "data",
-		Start:  time.Date(2015, 1, 1, 0, 0, 0, 0, time.UTC),
-		End:    time.Date(2015, 1, 2, 0, 0, 0, 0, time.UTC),
+		Since:  time.Date(2015, 1, 1, 0, 0, 0, 0, time.UTC),
+		Until:  time.Date(2015, 1, 2, 0, 0, 0, 0, time.UTC),
 		Calls: []FunctionCall{
 			FunctionCall{
 				Function: "FAKE",

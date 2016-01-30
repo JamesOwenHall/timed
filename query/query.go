@@ -7,13 +7,13 @@ import (
 )
 
 type Query struct {
-	Source string         `json:"source"`
-	Start  time.Time      `json:"start"`
-	End    time.Time      `json:"end"`
-	Calls  []FunctionCall `json:"compute"`
+	Source string
+	Since  time.Time
+	Until  time.Time
+	Calls  []FunctionCall
 }
 
 type FunctionCall struct {
-	Function string `json:"function"`
-	Argument string `json:"argument"`
+	Function string
+	Argument string
 }

@@ -39,11 +39,11 @@ func (c *Context) ToExecutor(q *Query) (*executor.Executor, error) {
 	}
 
 	// Time range.
-	if !q.Start.Before(q.End) {
+	if !q.Since.Before(q.Until) {
 		return nil, &ErrInvalidQuery{
 			Message:   "invalid range",
 			Component: "end",
-			Value:     q.End.Format(time.RFC3339),
+			Value:     q.Until.Format(time.RFC3339),
 		}
 	}
 
@@ -66,7 +66,7 @@ func (c *Context) ToExecutor(q *Query) (*executor.Executor, error) {
 	}
 
 	return &executor.Executor{
-		Source: source.Iterator(q.Start, q.End),
+		Source: source.Iterator(q.Since, q.Until),
 		Calls:  aggregators,
 	}, nil
 }
