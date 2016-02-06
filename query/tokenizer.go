@@ -119,8 +119,8 @@ func (t *Tokenizer) Next() *Token {
 	}
 
 	// Timestamps.
-	if isDigit(current) {
-		return &Token{Type: Timestamp, Raw: t.readTimestamp()}
+	if current == '\'' {
+		return t.readTimestamp()
 	}
 
 	return &Token{Type: Unknown, Raw: string([]rune{current})}
@@ -148,17 +148,22 @@ func (t *Tokenizer) readWord() string {
 	}
 }
 
-func (t *Tokenizer) readTimestamp() string {
-	ts := []rune{}
+func (t *Tokenizer) readTimestamp() *Token {
+	ts := []rune{t.current()}
+	t.input = t.input[1:]
 
 	for {
 		r := t.current()
-		if !isLetter(r) && !isDigit(r) && r != ':' && r != '-' && r != '+' {
-			return string(ts)
+		if r == -1 {
+			return &Token{Type: Unknown, Raw: string(ts)}
 		}
 
 		ts = append(ts, r)
 		t.input = t.input[1:]
+
+		if r == '\'' {
+			return &Token{Type: Timestamp, Raw: string(ts)}
+		}
 	}
 }
 

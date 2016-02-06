@@ -6,6 +6,8 @@ import (
 	"time"
 )
 
+const TimestampFormat = "'" + time.RFC3339 + "'"
+
 func Parse(input string) (*Query, error) {
 	return (&Parser{}).Parse(input)
 }
@@ -48,7 +50,7 @@ func (p *Parser) Parse(input string) (*Query, error) {
 	if since == nil {
 		return nil, p.currentError()
 	}
-	sinceTime, err := time.Parse(time.RFC3339, since.Raw)
+	sinceTime, err := time.Parse(TimestampFormat, since.Raw)
 	if err != nil {
 		return nil, &ErrUnknownToken{Raw: since.Raw}
 	}
@@ -62,7 +64,7 @@ func (p *Parser) Parse(input string) (*Query, error) {
 	if until == nil {
 		return nil, p.currentError()
 	}
-	untilTime, err := time.Parse(time.RFC3339, until.Raw)
+	untilTime, err := time.Parse(TimestampFormat, until.Raw)
 	if err != nil {
 		return nil, &ErrUnknownToken{Raw: until.Raw}
 	}

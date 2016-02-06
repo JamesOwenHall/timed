@@ -7,7 +7,7 @@ import (
 )
 
 func TestParse(t *testing.T) {
-	input := "COMPUTE a(b), c(d), e(f) FROM t1 SINCE 2000-01-01T00:00:00Z UNTIL 2000-01-10T00:00:00-05:00"
+	input := "COMPUTE a(b), c(d), e(f) FROM t1 SINCE '2000-01-01T00:00:00Z' UNTIL '2000-01-10T00:00:00-05:00'"
 	actual, err := Parse(input)
 	if err != nil {
 		t.Fatalf("unexpected error: %s", err)

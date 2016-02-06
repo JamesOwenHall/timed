@@ -5,7 +5,34 @@ import (
 	"testing"
 )
 
-func TestTokenizer(t *testing.T) {
+func TestTokenizerNext(t *testing.T) {
+	type Case struct {
+		input    string
+		expected TokenType
+	}
+
+	cases := []Case{
+		{"COMPUTE", Compute},
+		{"FROM", From},
+		{"SINCE", Since},
+		{"UNTIL", Until},
+		{"foo", Identifier},
+		{"(", OpenParen},
+		{")", CloseParen},
+		{",", Comma},
+		{"'2015-01-01T00:00:00+01:00'", Timestamp},
+	}
+
+	for _, c := range cases {
+		actual := NewTokenizer(c.input).Next()
+		expected := &Token{Type: c.expected, Raw: c.input}
+		if !reflect.DeepEqual(actual, expected) {
+			t.Fatalf("\nExpected: %v\n     Got: %v", expected, actual)
+		}
+	}
+}
+
+func TestTokenizerCollect(t *testing.T) {
 	input := `
 	COMPUTE
 		foo(f1),
@@ -13,9 +40,9 @@ func TestTokenizer(t *testing.T) {
 	FROM
 		t1
 	SINCE
-		2000-01-01T00:00:00Z
+		'2000-01-01T00:00:00Z'
 	UNTIL
-		2000-01-10T00:00:00+01:00
+		'2000-01-10T00:00:00+01:00'
 	`
 
 	actual := NewTokenizer(input).Collect()
@@ -33,9 +60,9 @@ func TestTokenizer(t *testing.T) {
 		{Type: From, Raw: "FROM"},
 		{Type: Identifier, Raw: "t1"},
 		{Type: Since, Raw: "SINCE"},
-		{Type: Timestamp, Raw: "2000-01-01T00:00:00Z"},
+		{Type: Timestamp, Raw: "'2000-01-01T00:00:00Z'"},
 		{Type: Until, Raw: "UNTIL"},
-		{Type: Timestamp, Raw: "2000-01-10T00:00:00+01:00"},
+		{Type: Timestamp, Raw: "'2000-01-10T00:00:00+01:00'"},
 	}
 
 	if !reflect.DeepEqual(actual, expected) {
