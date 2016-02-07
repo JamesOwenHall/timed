@@ -31,16 +31,13 @@ func (c *CountAggregator) Name() string {
 	return "count"
 }
 
-func (c *CountAggregator) Next(v Value) error {
+func (c *CountAggregator) Next(v interface{}) error {
 	c.count++
 	return nil
 }
 
-func (c *CountAggregator) Final() Value {
-	return Value{
-		Type: Int,
-		Data: c.count,
-	}
+func (c *CountAggregator) Final() interface{} {
+	return c.count
 }
 
 var ErrErrorAggregator = fmt.Errorf("error from ErrorAggregator")
@@ -51,13 +48,10 @@ func (e *ErrorAggregator) Name() string {
 	return "error"
 }
 
-func (e *ErrorAggregator) Next(v Value) error {
+func (e *ErrorAggregator) Next(v interface{}) error {
 	return ErrErrorAggregator
 }
 
-func (e *ErrorAggregator) Final() Value {
-	return Value{
-		Type: Unknown,
-		Data: nil,
-	}
+func (e *ErrorAggregator) Final() interface{} {
+	return nil
 }

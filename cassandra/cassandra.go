@@ -35,55 +35,9 @@ type iterator struct {
 }
 
 func (i *iterator) Next() (executor.Record, error) {
-	m := make(map[string]interface{})
-	if ok := i.iter.MapScan(m); !ok {
-		return nil, i.iter.Close()
-	}
-
 	rec := make(executor.Record)
-	for k, v := range m {
-		switch v := v.(type) {
-		case int64:
-			rec[k] = executor.Value{
-				Type: executor.Int64,
-				Data: v,
-			}
-		case int:
-			rec[k] = executor.Value{
-				Type: executor.Int,
-				Data: v,
-			}
-		case float64:
-			rec[k] = executor.Value{
-				Type: executor.Float64,
-				Data: v,
-			}
-		case float32:
-			rec[k] = executor.Value{
-				Type: executor.Float32,
-				Data: v,
-			}
-		case string:
-			rec[k] = executor.Value{
-				Type: executor.String,
-				Data: v,
-			}
-		case bool:
-			rec[k] = executor.Value{
-				Type: executor.Boolean,
-				Data: v,
-			}
-		case time.Time:
-			rec[k] = executor.Value{
-				Type: executor.Time,
-				Data: v,
-			}
-		default:
-			rec[k] = executor.Value{
-				Type: executor.Unknown,
-				Data: nil,
-			}
-		}
+	if ok := i.iter.MapScan(rec); !ok {
+		return nil, i.iter.Close()
 	}
 
 	return rec, nil

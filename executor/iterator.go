@@ -11,9 +11,9 @@ type Aggregator interface {
 	// Name returns the name of the aggregator.
 	Name() string
 	// Next is called over each value of a specified key.
-	Next(Value) error
+	Next(interface{}) error
 	// Final returns the final value of the aggregation.
-	Final() Value
+	Final() interface{}
 }
 
 // AggregatorCall represents a aggregator function call.

@@ -8,16 +8,16 @@ import (
 func TestExecutorExecute(t *testing.T) {
 	q := Executor{
 		Source: NewRecordIterator([]Record{
-			{"foo": Value{Int, 1}, "bar": Value{Unknown, nil}},
-			{"foo": Value{Int, 1}, "bar": Value{Unknown, nil}},
-			{"foo": Value{Int, 1}, "bar": Value{Unknown, nil}},
-			{"foo": Value{Int, 1}, "bar": Value{Unknown, nil}},
-			{"foo": Value{Int, 1}, "bar": Value{Unknown, nil}},
-			{"foo": Value{Int, 1}, "bar": Value{Unknown, nil}},
-			{"foo": Value{Int, 1}, "bar": Value{Unknown, nil}},
-			{"foo": Value{Int, 1}, "bar": Value{Unknown, nil}},
-			{"foo": Value{Int, 1}, "bar": Value{Unknown, nil}},
-			{"foo": Value{Int, 1}, "bar": Value{Unknown, nil}},
+			{"foo": 1, "bar": 23},
+			{"foo": 1, "bar": 23},
+			{"foo": 1, "bar": 23},
+			{"foo": 1, "bar": 23},
+			{"foo": 1, "bar": 23},
+			{"foo": 1, "bar": 23},
+			{"foo": 1, "bar": 23},
+			{"foo": 1, "bar": 23},
+			{"foo": 1, "bar": 23},
+			{"foo": 1, "bar": 23},
 		}),
 		Calls: []AggregatorCall{
 			{Key: "foo", Aggregator: new(CountAggregator)},
@@ -26,8 +26,8 @@ func TestExecutorExecute(t *testing.T) {
 	}
 
 	expected := Record{
-		"count_foo": Value{Int, 10},
-		"count_bar": Value{Int, 10},
+		"count_foo": 10,
+		"count_bar": 10,
 	}
 	actual, err := q.Execute()
 
@@ -42,9 +42,9 @@ func TestExecutorExecute(t *testing.T) {
 func TestUnknownField(t *testing.T) {
 	q := Executor{
 		Source: NewRecordIterator([]Record{
-			{"foo": Value{Int, 1}},
-			{"foo": Value{Int, 2}},
-			{"foo": Value{Int, 3}},
+			{"foo": 1},
+			{"foo": 2},
+			{"foo": 3},
 		}),
 		Calls: []AggregatorCall{
 			{Key: "fake_field", Aggregator: new(CountAggregator)},
@@ -61,7 +61,7 @@ func TestUnknownField(t *testing.T) {
 func TestExecutorAggregatorError(t *testing.T) {
 	q := Executor{
 		Source: NewRecordIterator([]Record{
-			{"foo": Value{Int, 1}},
+			{"foo": 1},
 		}),
 		Calls: []AggregatorCall{
 			{Key: "foo", Aggregator: new(CountAggregator)},

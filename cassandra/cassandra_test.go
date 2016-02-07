@@ -44,22 +44,22 @@ func TestIterator(t *testing.T) {
 
 	expected := []executor.Record{
 		{
-			"partition": executor.Value{executor.Int, 1},
-			"period":    executor.Value{executor.Time, time.Date(2015, 1, 2, 0, 0, 0, 0, time.UTC)},
-			"shop_id":   executor.Value{executor.Int64, int64(100)},
-			"sample":    executor.Value{executor.String, "hola"},
+			"partition": 1,
+			"period":    time.Date(2015, 1, 2, 0, 0, 0, 0, time.UTC),
+			"shop_id":   int64(100),
+			"sample":    "hola",
 		},
 		{
-			"partition": executor.Value{executor.Int, 1},
-			"period":    executor.Value{executor.Time, time.Date(2015, 1, 3, 0, 0, 0, 0, time.UTC)},
-			"shop_id":   executor.Value{executor.Int64, int64(100)},
-			"sample":    executor.Value{executor.String, "hola"},
+			"partition": 1,
+			"period":    time.Date(2015, 1, 3, 0, 0, 0, 0, time.UTC),
+			"shop_id":   int64(100),
+			"sample":    "hola",
 		},
 		{
-			"partition": executor.Value{executor.Int, 1},
-			"period":    executor.Value{executor.Time, time.Date(2015, 1, 4, 0, 0, 0, 0, time.UTC)},
-			"shop_id":   executor.Value{executor.Int64, int64(100)},
-			"sample":    executor.Value{executor.String, "hola"},
+			"partition": 1,
+			"period":    time.Date(2015, 1, 4, 0, 0, 0, 0, time.UTC),
+			"shop_id":   int64(100),
+			"sample":    "hola",
 		},
 	}
 

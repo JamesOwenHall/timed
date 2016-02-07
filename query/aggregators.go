@@ -29,16 +29,13 @@ func (c *CountAggregator) Name() string {
 	return "count"
 }
 
-func (c *CountAggregator) Next(v executor.Value) error {
+func (c *CountAggregator) Next(v interface{}) error {
 	c.count++
 	return nil
 }
 
-func (c *CountAggregator) Final() executor.Value {
-	return executor.Value{
-		Type: executor.Int64,
-		Data: c.count,
-	}
+func (c *CountAggregator) Final() interface{} {
+	return c.count
 }
 
 type SumAggregator struct {
@@ -50,29 +47,29 @@ func (s *SumAggregator) Name() string {
 	return "sum"
 }
 
-func (s *SumAggregator) Next(v executor.Value) error {
-	switch v.Type {
-	case executor.Int64:
-		s.intSum += v.Data.(int64)
-	case executor.Int:
-		s.intSum += int64(v.Data.(int))
-	case executor.Float64:
-		s.floatSum += v.Data.(float64)
-	case executor.Float32:
-		s.floatSum += float64(v.Data.(float32))
+func (s *SumAggregator) Next(v interface{}) error {
+	switch v := v.(type) {
+	case int:
+		s.intSum += int64(v)
+	case int64:
+		s.intSum += v
+	case float32:
+		s.floatSum += float64(v)
+	case float64:
+		s.floatSum += v
 	default:
-		return &ErrInvalidArg{Type: v.Type, Function: "sum"}
+		return &ErrInvalidArg{Type: fmt.Sprintf("%T", v), Function: "sum"}
 	}
 
 	return nil
 }
 
-func (s *SumAggregator) Final() executor.Value {
+func (s *SumAggregator) Final() interface{} {
 	if s.intSum != 0 {
-		return executor.Value{Type: executor.Int64, Data: s.intSum}
+		return s.intSum
 	}
 
-	return executor.Value{Type: executor.Float64, Data: s.floatSum}
+	return s.floatSum
 }
 
 type AvgAggregator struct {
@@ -85,51 +82,42 @@ func (a *AvgAggregator) Name() string {
 	return "avg"
 }
 
-func (a *AvgAggregator) Next(v executor.Value) error {
+func (a *AvgAggregator) Next(v interface{}) error {
 	a.count++
 
-	switch v.Type {
-	case executor.Int64:
-		a.intSum += v.Data.(int64)
-	case executor.Int:
-		a.intSum += int64(v.Data.(int))
-	case executor.Float64:
-		a.floatSum += v.Data.(float64)
-	case executor.Float32:
-		a.floatSum += float64(v.Data.(float32))
+	switch v := v.(type) {
+	case int:
+		a.intSum += int64(v)
+	case int64:
+		a.intSum += v
+	case float32:
+		a.floatSum += float64(v)
+	case float64:
+		a.floatSum += v
 	default:
-		return &ErrInvalidArg{Type: v.Type, Function: "avg"}
+		return &ErrInvalidArg{Type: fmt.Sprintf("%T", v), Function: "avg"}
 	}
 
 	return nil
 }
 
-func (a *AvgAggregator) Final() executor.Value {
+func (a *AvgAggregator) Final() interface{} {
+	if a.count == 0 {
+		return 0
+	}
+
 	if a.intSum != 0 {
-		return executor.Value{
-			Type: executor.Float64,
-			Data: float64(a.intSum) / float64(a.count),
-		}
+		return float64(a.intSum) / float64(a.count)
 	}
 
-	if a.floatSum == 0.0 {
-		return executor.Value{
-			Type: executor.Float64,
-			Data: 0.0,
-		}
-	}
-
-	return executor.Value{
-		Type: executor.Float64,
-		Data: a.floatSum / float64(a.count),
-	}
+	return a.floatSum / float64(a.count)
 }
 
 type ErrInvalidArg struct {
-	Type     executor.ValueType
+	Type     string
 	Function string
 }
 
 func (e *ErrInvalidArg) Error() string {
-	return fmt.Sprintf("invalid type %s for function %s", e.Type.String(), e.Function)
+	return fmt.Sprintf("invalid type %s for function %s", e.Type, e.Function)
 }
