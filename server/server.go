@@ -20,6 +20,7 @@ type Server struct {
 func NewServer(log *logrus.Logger, config *Config) (*Server, error) {
 	cluster := gocql.NewCluster(config.Cassandra.Addresses...)
 	cluster.Keyspace = config.Cassandra.Keyspace
+	cluster.ProtoVersion = 4
 
 	session, err := cluster.CreateSession()
 	if err != nil {

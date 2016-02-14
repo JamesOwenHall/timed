@@ -17,6 +17,7 @@ func init() {
 	if cass := os.Getenv("TEST_CASSANDRA"); cass != "" {
 		cluster := gocql.NewCluster(cass)
 		cluster.Keyspace = "timed"
+		cluster.ProtoVersion = 4
 
 		var err error
 		session, err = cluster.CreateSession()
