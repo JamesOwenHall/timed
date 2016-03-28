@@ -1,4 +1,4 @@
-export TEST_CASSANDRA=192.168.99.100
+export TEST_CASSANDRA=127.0.0.1
 
 all: bin/timed-server
 

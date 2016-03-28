@@ -25,7 +25,7 @@ func (s *Source) Iterator(start, end time.Time) executor.Iterator {
 
 func (s *Source) makeQuery() string {
 	return fmt.Sprintf(
-		"SELECT * FROM %s WHERE %s >= ? AND %s < ? ALLOW FILTERING",
+		"SELECT * FROM %s WHERE partition = 1 AND %s >= ? AND %s < ?",
 		s.Name, s.TimeKey, s.TimeKey,
 	)
 }

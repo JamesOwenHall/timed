@@ -87,7 +87,7 @@ func TestSourceMakeQuery(t *testing.T) {
 		Name:    "foo",
 		TimeKey: "tk",
 	}
-	expected := "SELECT * FROM foo WHERE tk >= ? AND tk < ? ALLOW FILTERING"
+	expected := "SELECT * FROM foo WHERE partition = 1 AND tk >= ? AND tk < ?"
 	actual := source.makeQuery()
 
 	if actual != expected {
